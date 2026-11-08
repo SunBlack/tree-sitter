@@ -19,7 +19,13 @@ endif()
 
 add_library(tree-sitter ${TS_SOURCE_FILES})
 
-target_include_directories(tree-sitter PRIVATE lib/src lib/src/wasm PUBLIC lib/include)
+target_include_directories(tree-sitter
+  PRIVATE
+    lib/src
+    lib/src/wasm
+  PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 if(MSVC)
   target_compile_options(tree-sitter PRIVATE
@@ -101,6 +107,13 @@ install(FILES lib/include/tree_sitter/api.h
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 install(TARGETS tree-sitter
+        EXPORT tree-sitter-config
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+install(
+    EXPORT tree-sitter-config
+    NAMESPACE tree-sitter::
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/tree-sitter"
+)
